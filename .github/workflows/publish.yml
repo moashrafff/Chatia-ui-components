@@ -7,13 +7,17 @@ on:
         description: 'Version (e.g. 1.0.0)'
         required: true
 
+permissions:
+  contents: write   # needed to push tags & create releases
+
 jobs:
   publish:
     name: Publish to Maven Central
-    runs-on: ubuntu-latest  # macOS not needed; Ubuntu is faster/cheaper
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
+        # v4 is the latest major of checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -22,24 +26,33 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # Install Android SDK commandline tools (so AGP can install build-tools/platforms)
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Grant permission to execute Gradle
         run: chmod +x gradlew
 
-      - name: Build (optional but recommended)
+      # Optional pre-build of just the library; skip lint to avoid sample/lint crashes
+      - name: Build library (skip lint)
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build
+          arguments: :chatia-ui-components:build -x lint
 
+      # Publish ONLY the library module to Maven Central
       - name: Publish Library
         run: |
           echo "Publishing library 🚀"
-          ./gradlew publish --no-daemon
+          ./gradlew \
+            :chatia-ui-components:publishAllPublicationsToMavenCentralRepository \
+            -x lint \
+            --no-daemon
           echo "Published ✅"
         env:
-          # Set the Gradle 'version' property from the workflow input
+          # Inject the version into Gradle (project.version)
           ORG_GRADLE_PROJECT_version: ${{ github.event.inputs.versionName }}
 
-          # In-memory signing (exact camelCase keys expected by VannikTech)
+          # In-memory GPG signing (must match plugin property names)
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYPASSWORD }}
 
@@ -47,6 +60,7 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALUSERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALPASSWORD }}
 
+      # Tag the commit with v<version>
       - name: Create and push tag
         run: |
           git config user.email "${{ github.actor }}@users.noreply.github.com"
@@ -54,6 +68,7 @@ jobs:
           git tag -a "v${{ github.event.inputs.versionName }}" -m "Release v${{ github.event.inputs.versionName }}"
           git push origin "v${{ github.event.inputs.versionName }}"
 
+      # Create a draft GitHub Release from that tag
       - name: Create Release (draft)
         uses: softprops/action-gh-release@v2
         with:
