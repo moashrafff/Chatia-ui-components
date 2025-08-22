@@ -1,79 +1,63 @@
 name: Publish
-
 on:
   workflow_dispatch:
     inputs:
       versionName:
-        description: 'Version (e.g. 1.0.0)'
+        description: 'Version Name'
         required: true
-
-permissions:
-  contents: write   # needed to push tags & create releases
 
 jobs:
   publish:
-    name: Publish to Maven Central
-    runs-on: ubuntu-latest
+    name: Publish
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
-        # v4 is the latest major of checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
-          distribution: temurin
           java-version: '17'
+          distribution: 'adopt'
 
-      # Install Android SDK commandline tools (so AGP can install build-tools/platforms)
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Grant permission to execute Gradle
+      - name: Grant Permission to Execute Gradle
         run: chmod +x gradlew
 
-      # Optional pre-build of just the library; skip lint to avoid sample/lint crashes
-      - name: Build library (skip lint)
+      - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :chatia-ui-components:build -x lint
+          arguments: build
 
-      # Publish ONLY the library module to Maven Central
       - name: Publish Library
         run: |
-          echo "Publishing library 🚀"
-          ./gradlew \
-            :chatia-ui-components:publishAllPublicationsToMavenCentralRepository \
-            -x lint \
-            --no-daemon
-          echo "Published ✅"
+          echo "Publishing and Releasing library 🚀"
+          ./gradlew publish
+          echo "Published and Released ✅"
         env:
-          # Inject the version into Gradle (project.version)
-          ORG_GRADLE_PROJECT_version: ${{ github.event.inputs.versionName }}
-
-          # In-memory GPG signing (must match plugin property names)
+          ORG_GRADLE_PROJECT_VERSION_NAME: ${{ github.event.inputs.versionName }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYPASSWORD }}
-
-          # Sonatype (Maven Central) credentials
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALUSERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALPASSWORD }}
 
-      # Tag the commit with v<version>
       - name: Create and push tag
         run: |
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git config user.name  "${{ github.actor }}"
-          git tag -a "v${{ github.event.inputs.versionName }}" -m "Release v${{ github.event.inputs.versionName }}"
-          git push origin "v${{ github.event.inputs.versionName }}"
+          git config --global user.email "mohamed.ashraf.radi0@gmail.com"
+          git config --global user.name "$GITHUB_ACTOR"
 
-      # Create a draft GitHub Release from that tag
-      - name: Create Release (draft)
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: "v${{ github.event.inputs.versionName }}"
-          name: "v${{ github.event.inputs.versionName }}"
-          draft: true
+          git tag -a $TAG -m "Release v$TAG"
+          git push origin $TAG
+        env:
+          TAG: ${{ github.event.inputs.versionName }}
+
+      - name: Create Release on GitHub
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.versionName }}
+          release_name: ${{ github.event.inputs.versionName }}
+          draft: true
+          prerelease: false
