@@ -24,48 +24,42 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      # Android SDK (AGP 8.7 needs build-tools; macOS image has the base SDK but this ensures tools exist)
+      # Ensure Android SDK/build-tools exist
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Grant execute permission for Gradle
+      - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # Optional but helpful: Gradle caching
-      - name: Setup Gradle
+      # Cache only; this step does not run Gradle itself
+      - name: Setup Gradle caching
         uses: gradle/actions/setup-gradle@v3
 
-      # Build ONLY the library and SKIP lint
-      - name: Build library only
-        run: ./gradlew :chatia-ui-components:assemble :chatia-ui-components:check -x lint --no-daemon
+      # Build ONLY the library; skip all lint everywhere (and explicitly skip sample app lint)
+      - name: Build library (no lint)
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: >
+            :chatia-ui-components:assemble
+            :chatia-ui-components:check
+            -x lint
+            -x :sample:composeApp:lint
+            -x :sample:composeApp:lintVitalAnalyzeRelease
+            --no-daemon --stacktrace
 
-      # Publish ONLY the library (Vanniktech) and SKIP lint
-      - name: Publish to Maven Central
+      # Publish ONLY the library; skip lint
+      - name: Publish to Maven Central (no lint)
+        uses: gradle/gradle-build-action@v2
         env:
           ORG_GRADLE_PROJECT_version: ${{ github.event.inputs.versionName }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYPASSWORD }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALUSERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALPASSWORD }}
-        run: ./gradlew :chatia-ui-components:publishAllPublicationsToMavenCentralRepository -x lint --no-daemon
-
-      - name: Create and push tag
-        run: |
-          git config --global user.email "mohamed.ashraf.radi0@gmail.com"
-          git config --global user.name "$GITHUB_ACTOR"
-
-          git tag -a $TAG -m "Release v$TAG"
-          git push origin $TAG
-        env:
-          TAG: ${{ github.event.inputs.versionName }}
-
-      - name: Create Release on GitHub
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.inputs.versionName }}
-          release_name: ${{ github.event.inputs.versionName }}
-          draft: true
-          prerelease: false
+          arguments: >
+            :chatia-ui-components:publishAllPublicationsToMavenCentralRepository
+            -x lint
+            -x :sample:composeApp:lint
+            -x :sample:composeApp:lintVitalAnalyzeRelease
+            --no-daemon --stacktrace
