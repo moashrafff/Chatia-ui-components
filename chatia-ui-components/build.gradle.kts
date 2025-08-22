@@ -18,7 +18,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -29,7 +29,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
@@ -52,7 +52,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.chatia.ui"
+    namespace = "com.chatia.ui.components"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {

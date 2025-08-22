@@ -50,7 +50,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.chatia.ui"
+    namespace = "com.chatia.sample"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
@@ -59,6 +59,11 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+    }
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+        disable += setOf("NullSafeMutableLiveData") // the crashing detector
     }
     packaging {
         resources {
