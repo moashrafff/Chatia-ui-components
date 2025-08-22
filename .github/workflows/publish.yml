@@ -47,17 +47,16 @@ jobs:
             --stacktrace
 
       # Publish ONLY the library with Vanniktech Maven Publish
-      - name: Publish to Maven Central (no lint)
-        uses: gradle/gradle-build-action@v2
+      - name: Publish Library
+        run: |
+          echo "Publishing and Releasing library 🚀"
+          ./gradlew publish
+          echo "Published and Released ✅"
         env:
-          ORG_GRADLE_PROJECT_version: ${{ github.event.inputs.versionName }}
+          ORG_GRADLE_PROJECT_VERSION_NAME: ${{ github.event.inputs.versionName }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYPASSWORD }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALUSERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALPASSWORD }}
-        with:
-          arguments: >
-            :chatia-ui-components:publishAllPublicationsToMavenCentralRepository
-            -x lint
-            --no-daemon
-            --stacktrace
+
+
