@@ -24,18 +24,16 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      # Ensure Android SDK/build-tools exist
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # Cache only; this step does not run Gradle itself
       - name: Setup Gradle caching
         uses: gradle/actions/setup-gradle@v3
 
-      # Build ONLY the library; skip all lint everywhere (and explicitly skip sample app lint)
+      # Build ONLY the library; skip all lint
       - name: Build library (no lint)
         uses: gradle/gradle-build-action@v2
         with:
@@ -44,10 +42,9 @@ jobs:
             :chatia-ui-components:check
             -x lint
             -x :sample:composeApp:lint
-            -x :sample:composeApp:lintVitalAnalyzeRelease
             --no-daemon --stacktrace
 
-      # Publish ONLY the library; skip lint
+      # Publish ONLY the library; skip all lint
       - name: Publish to Maven Central (no lint)
         uses: gradle/gradle-build-action@v2
         env:
@@ -61,5 +58,4 @@ jobs:
             :chatia-ui-components:publishAllPublicationsToMavenCentralRepository
             -x lint
             -x :sample:composeApp:lint
-            -x :sample:composeApp:lintVitalAnalyzeRelease
             --no-daemon --stacktrace
