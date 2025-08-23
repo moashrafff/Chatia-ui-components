@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -10,6 +11,45 @@ plugins {
 }
 
 group = "io.github.moashrafff"
+version = "1.0.0"
+
+mavenPublishing {
+    // Publish to the new Central Portal (S01)
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+
+    // groupId, artifactId, version
+    coordinates(group.toString(), "chatia-ui-components", version.toString())
+
+    pom {
+        name.set("Chatia UI Components")
+        description.set("Reusable UI components for Kotlin Multiplatform using Jetpack Compose")
+        inceptionYear.set("2025")
+        url.set("https://github.com/moashrafff/Chatia-ui-components")
+
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+
+        developers {
+            developer {
+                id.set("moashrafff")
+                name.set("Mohamed Ashraf")
+                url.set("https://github.com/moashrafff")
+            }
+        }
+
+        scm {
+            url.set("https://github.com/moashrafff/Chatia-ui-components")
+            connection.set("scm:git:git://github.com/moashrafff/Chatia-ui-components.git")
+            developerConnection.set("scm:git:ssh://git@github.com/moashrafff/Chatia-ui-components.git")
+        }
+    }
+}
 
 kotlin {
     androidTarget {
