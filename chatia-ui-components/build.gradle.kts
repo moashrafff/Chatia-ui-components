@@ -10,59 +10,53 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
-group = "io.github.moashrafff"
-version = "1.0.0"
+
+group = providers.gradleProperty("GROUP").get()
+version = providers.gradleProperty("VERSION_NAME").get()
 
 mavenPublishing {
     // Publish to the new Central Portal (S01)
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
 
-    // groupId, artifactId, version
-    coordinates(group.toString(), "chatia-ui-components", version.toString())
-
     pom {
-        name.set("Chatia UI Components")
-        description.set("Reusable UI components for Kotlin Multiplatform using Jetpack Compose")
+        name.set(providers.gradleProperty("POM_NAME").orNull ?: "Chatia UI Components")
+        description.set(providers.gradleProperty("POM_DESCRIPTION").orNull ?: "Reusable UI components for KMP")
         inceptionYear.set("2025")
-        url.set("https://github.com/moashrafff/Chatia-ui-components")
-
+        url.set(providers.gradleProperty("POM_URL").orNull ?: "https://github.com/moashrafff/Chatia-ui-components")
         licenses {
             license {
-                name.set("The Apache License, Version 2.0")
-                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                name.set(providers.gradleProperty("POM_LICENSE_NAME").orNull ?: "The Apache License, Version 2.0")
+                url.set(providers.gradleProperty("POM_LICENSE_URL").orNull ?: "https://www.apache.org/licenses/LICENSE-2.0.txt")
                 distribution.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
-
         developers {
             developer {
-                id.set("moashrafff")
-                name.set("Mohamed Ashraf")
-                url.set("https://github.com/moashrafff")
+                id.set(providers.gradleProperty("POM_DEVELOPER_ID").orNull ?: "moashrafff")
+                name.set(providers.gradleProperty("POM_DEVELOPER_NAME").orNull ?: "Mohamed Ashraf")
+                url.set(providers.gradleProperty("POM_DEVELOPER_URL").orNull ?: "https://github.com/moashrafff")
             }
         }
-
         scm {
-            url.set("https://github.com/moashrafff/Chatia-ui-components")
-            connection.set("scm:git:git://github.com/moashrafff/Chatia-ui-components.git")
-            developerConnection.set("scm:git:ssh://git@github.com/moashrafff/Chatia-ui-components.git")
+            url.set(providers.gradleProperty("POM_SCM_URL").orNull ?: "https://github.com/moashrafff/Chatia-ui-components")
+            connection.set(providers.gradleProperty("POM_SCM_CONNECTION").orNull
+                ?: "scm:git:git://github.com/moashrafff/Chatia-ui-components.git")
+            developerConnection.set(providers.gradleProperty("POM_SCM_DEV_CONNECTION").orNull
+                ?: "scm:git:ssh://git@github.com/moashrafff/Chatia-ui-components.git")
         }
     }
 }
 
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class) compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 
     listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
+        iosX64(), iosArm64(), iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeLib"
