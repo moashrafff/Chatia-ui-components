@@ -15,7 +15,6 @@ group = providers.gradleProperty("GROUP").get()
 version = providers.gradleProperty("VERSION_NAME").get()
 
 mavenPublishing {
-    // Publish to the new Central Portal (S01)
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
 
