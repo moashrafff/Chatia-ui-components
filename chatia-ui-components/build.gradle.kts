@@ -16,17 +16,37 @@ version = providers.gradleProperty("VERSION_NAME").get()
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-    signAllPublications()
+
+    val shouldSign =
+        providers.environmentVariable("CI").isPresent && (providers.gradleProperty("signingInMemoryKey").isPresent || providers.gradleProperty(
+            "signing.secretKeyRingFile"
+        ).isPresent)
+
+    if (shouldSign) {
+        signAllPublications()
+    }
+
 
     pom {
         name.set(providers.gradleProperty("POM_NAME").orNull ?: "Chatia UI Components")
-        description.set(providers.gradleProperty("POM_DESCRIPTION").orNull ?: "Reusable UI components for KMP")
+        description.set(
+            providers.gradleProperty("POM_DESCRIPTION").orNull ?: "Reusable UI components for KMP"
+        )
         inceptionYear.set("2025")
-        url.set(providers.gradleProperty("POM_URL").orNull ?: "https://github.com/moashrafff/Chatia-ui-components")
+        url.set(
+            providers.gradleProperty("POM_URL").orNull
+                ?: "https://github.com/moashrafff/Chatia-ui-components"
+        )
         licenses {
             license {
-                name.set(providers.gradleProperty("POM_LICENSE_NAME").orNull ?: "The Apache License, Version 2.0")
-                url.set(providers.gradleProperty("POM_LICENSE_URL").orNull ?: "https://www.apache.org/licenses/LICENSE-2.0.txt")
+                name.set(
+                    providers.gradleProperty("POM_LICENSE_NAME").orNull
+                        ?: "The Apache License, Version 2.0"
+                )
+                url.set(
+                    providers.gradleProperty("POM_LICENSE_URL").orNull
+                        ?: "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                )
                 distribution.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
@@ -34,15 +54,25 @@ mavenPublishing {
             developer {
                 id.set(providers.gradleProperty("POM_DEVELOPER_ID").orNull ?: "moashrafff")
                 name.set(providers.gradleProperty("POM_DEVELOPER_NAME").orNull ?: "Mohamed Ashraf")
-                url.set(providers.gradleProperty("POM_DEVELOPER_URL").orNull ?: "https://github.com/moashrafff")
+                url.set(
+                    providers.gradleProperty("POM_DEVELOPER_URL").orNull
+                        ?: "https://github.com/moashrafff"
+                )
             }
         }
         scm {
-            url.set(providers.gradleProperty("POM_SCM_URL").orNull ?: "https://github.com/moashrafff/Chatia-ui-components")
-            connection.set(providers.gradleProperty("POM_SCM_CONNECTION").orNull
-                ?: "scm:git:git://github.com/moashrafff/Chatia-ui-components.git")
-            developerConnection.set(providers.gradleProperty("POM_SCM_DEV_CONNECTION").orNull
-                ?: "scm:git:ssh://git@github.com/moashrafff/Chatia-ui-components.git")
+            url.set(
+                providers.gradleProperty("POM_SCM_URL").orNull
+                    ?: "https://github.com/moashrafff/Chatia-ui-components"
+            )
+            connection.set(
+                providers.gradleProperty("POM_SCM_CONNECTION").orNull
+                    ?: "scm:git:git://github.com/moashrafff/Chatia-ui-components.git"
+            )
+            developerConnection.set(
+                providers.gradleProperty("POM_SCM_DEV_CONNECTION").orNull
+                    ?: "scm:git:ssh://git@github.com/moashrafff/Chatia-ui-components.git"
+            )
         }
     }
 }
