@@ -7,15 +7,21 @@ on:
         description: "Version to publish (e.g. 1.0.3)"
         required: true
 
+concurrency:
+  group: publish-${{ github.ref || github.run_id }}
+  cancel-in-progress: false
+
 jobs:
   publish:
-    runs-on: macos-latest
+    runs-on: macos-14
     permissions:
       contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v3
@@ -35,19 +41,32 @@ jobs:
       - name: Setup Gradle (cache & build scan init)
         uses: gradle/actions/setup-gradle@v3
 
-      # Build ONLY the library; skip all lint to avoid Kotlin/AGP lint incompatibilities
+      # Optional pre-check build; publishing will build targets again as needed
       - name: Build library (no lint)
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: >
-            :chatia-ui-components:assemble
-            :chatia-ui-components:check
-            -x lint
-            --no-daemon
+        run: |
+          ./gradlew \
+            :chatia-ui-components:assemble \
+            :chatia-ui-components:check \
+            -x lint \
+            --no-daemon \
             --stacktrace
 
-      # Publish ONLY the library with Vanniktech Maven Publish
-      - name: Publish Library
+      # Create and push tag before publishing if it does not already exist
+      - name: Create and push tag (if missing)
+        shell: bash
+        run: |
+          TAG="${{ github.event.inputs.versionName }}"
+          if git rev-parse "v$TAG" >/dev/null 2>&1; then
+            echo "Tag v$TAG already exists. Skipping tag creation."
+          else
+            git config --global user.email "mohamed.ashraf.radi0@gmail.com"
+            git config --global user.name "$GITHUB_ACTOR"
+            git tag -a "v$TAG" -m "Release v$TAG"
+            git push origin "v$TAG"
+          fi
+
+      # Publish with Vanniktech Maven Publish
+      - name: Publish Library to Maven Central
         run: |
           echo "Publishing and Releasing library 🚀"
           ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache --stacktrace
@@ -60,26 +79,14 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALUSERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALPASSWORD }}
 
-
-      - name: Create and push tag
-        run: |
-          git config --global user.email "mohamed.ashraf.radi0@gmail.com"
-          git config --global user.name "$GITHUB_ACTOR"
-          
-          git tag -a $TAG -m "Release v$TAG"
-          git push origin $TAG
-        env:
-          TAG: ${{ github.event.inputs.versionName }}
-
-      - name: Create Release on GitHub
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub Release (draft)
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.versionName }}
-          release_name: ${{ github.event.inputs.versionName }}
+          tag_name: v${{ github.event.inputs.versionName }}
+          name: v${{ github.event.inputs.versionName }}
           draft: true
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 

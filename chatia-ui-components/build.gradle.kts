@@ -1,4 +1,4 @@
-import com.vanniktech.maven.publish.SonatypeHost
+
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -11,71 +11,8 @@ plugins {
 }
 
 
-group = providers.gradleProperty("GROUP").get()
-version = providers.gradleProperty("VERSION_NAME").get()
-
-mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
-    val shouldSign =
-        providers.environmentVariable("CI").isPresent && (providers.gradleProperty("signingInMemoryKey").isPresent || providers.gradleProperty(
-            "signing.secretKeyRingFile"
-        ).isPresent)
-
-    if (shouldSign) {
-        signAllPublications()
-    }
-
-
-    pom {
-        name.set(providers.gradleProperty("POM_NAME").orNull ?: "Chatia UI Components")
-        description.set(
-            providers.gradleProperty("POM_DESCRIPTION").orNull ?: "Reusable UI components for KMP"
-        )
-        inceptionYear.set("2025")
-        url.set(
-            providers.gradleProperty("POM_URL").orNull
-                ?: "https://github.com/moashrafff/Chatia-ui-components"
-        )
-        licenses {
-            license {
-                name.set(
-                    providers.gradleProperty("POM_LICENSE_NAME").orNull
-                        ?: "The Apache License, Version 2.0"
-                )
-                url.set(
-                    providers.gradleProperty("POM_LICENSE_URL").orNull
-                        ?: "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                )
-                distribution.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-        }
-        developers {
-            developer {
-                id.set(providers.gradleProperty("POM_DEVELOPER_ID").orNull ?: "moashrafff")
-                name.set(providers.gradleProperty("POM_DEVELOPER_NAME").orNull ?: "Mohamed Ashraf")
-                url.set(
-                    providers.gradleProperty("POM_DEVELOPER_URL").orNull
-                        ?: "https://github.com/moashrafff"
-                )
-            }
-        }
-        scm {
-            url.set(
-                providers.gradleProperty("POM_SCM_URL").orNull
-                    ?: "https://github.com/moashrafff/Chatia-ui-components"
-            )
-            connection.set(
-                providers.gradleProperty("POM_SCM_CONNECTION").orNull
-                    ?: "scm:git:git://github.com/moashrafff/Chatia-ui-components.git"
-            )
-            developerConnection.set(
-                providers.gradleProperty("POM_SCM_DEV_CONNECTION").orNull
-                    ?: "scm:git:ssh://git@github.com/moashrafff/Chatia-ui-components.git"
-            )
-        }
-    }
-}
+group = "io.github.moashrafff"
+version = "1.0.0"
 
 kotlin {
     androidTarget {
@@ -110,6 +47,32 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+    }
+}
+publishing {
+    publications.withType<MavenPublication>().configureEach {
+        pom {
+            name.set("chatia-ui-components")
+            description.set("chatia ui components library for project design system")
+            url.set("https://github.com/moashrafff/Chatia-ui-components")
+            licenses {
+                license {
+                    name.set("Apache-2.0")
+                    url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                }
+            }
+            developers {
+                developer {
+                    id.set("moashrafff")
+                    name.set("moashrafff")
+                }
+            }
+            scm {
+                url.set("https://github.com/moashrafff/Chatia-ui-components")
+                connection.set("scm:git:git://github.com/moashrafff/Chatia-ui-components.git")
+                developerConnection.set("scm:git:ssh://git@github.com/moashrafff/Chatia-ui-components.git")
+            }
         }
     }
 }
