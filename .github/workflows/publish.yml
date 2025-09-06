@@ -1,13 +1,9 @@
-name: Publish
+# .github/workflows/publish.yml
 
+name: Publish
 on:
   release:
     types: [released, prereleased]
-
-concurrency:
-  group: publish-${{ github.ref || github.run_id }}
-  cancel-in-progress: false
-
 jobs:
   publish:
     name: Release build and publish
@@ -27,4 +23,4 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALPASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYPASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS}}
