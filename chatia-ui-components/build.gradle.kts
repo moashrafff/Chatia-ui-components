@@ -57,7 +57,12 @@ mavenPublishing {
 
     signAllPublications()
 
-    coordinates(group.toString(), "chatia-ui-components", version.toString())
+    coordinates(
+        groupId = group.toString(),
+        artifactId = "chatia-ui-components",
+        version = version.toString()
+    )
+
 
     pom {
         name = "chatia-ui-components"
