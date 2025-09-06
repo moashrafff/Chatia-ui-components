@@ -3,7 +3,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("com.vanniktech.maven.publish") version "0.28.0"
+    id("com.vanniktech.maven.publish") version "0.34.0"
+
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
@@ -50,29 +51,37 @@ kotlin {
         }
     }
 }
-publishing {
-    publications.withType<MavenPublication>().configureEach {
-        pom {
-            name.set("chatia-ui-components")
-            description.set("chatia ui components library for project design system")
-            url.set("https://github.com/moashrafff/Chatia-ui-components")
-            licenses {
-                license {
-                    name.set("Apache-2.0")
-                    url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                }
+
+mavenPublishing {
+    publishToMavenCentral()
+
+    signAllPublications()
+
+    coordinates(group.toString(), "chatia-ui-components", version.toString())
+
+    pom {
+        name = "chatia-ui-components"
+        description = "chatia ui components library for project design system."
+        inceptionYear = "2025"
+        url = "https://github.com/moashrafff/Chatia-ui-components/"
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
             }
-            developers {
-                developer {
-                    id.set("moashrafff")
-                    name.set("moashrafff")
-                }
+        }
+        developers {
+            developer {
+                id = "moashrafff"
+                name = "moashrafff"
+                url = "https://github.com/moashrafff/"
             }
-            scm {
-                url.set("https://github.com/moashrafff/Chatia-ui-components")
-                connection.set("scm:git:git://github.com/moashrafff/Chatia-ui-components.git")
-                developerConnection.set("scm:git:ssh://git@github.com/moashrafff/Chatia-ui-components.git")
-            }
+        }
+        scm {
+            url = "https://github.com/moashrafff/Chatia-ui-components/"
+            connection = "scm:git:git://github.com/moashrafff/chatia-ui-components.git"
+            developerConnection = "scm:git:ssh://git@github.com/moashrafff/chatia-ui-components.git"
         }
     }
 }
