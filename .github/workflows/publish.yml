@@ -1,11 +1,8 @@
-name: Publish KMP Library
+name: Publish
 
 on:
-  workflow_dispatch:
-    inputs:
-      versionName:
-        description: "Version to publish (e.g. 1.0.3)"
-        required: true
+  release:
+    types: [released, prereleased]
 
 concurrency:
   group: publish-${{ github.ref || github.run_id }}
@@ -13,89 +10,21 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: macos-14
-    permissions:
-      contents: write
-
+    name: Release build and publish
+    runs-on: macOS-latest
     steps:
-      - name: Checkout
+      - name: Check out code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v3
-
-      - name: Set up Java 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Make Gradle executable
-        run: chmod +x gradlew
-
-      - name: Setup Gradle (cache & build scan init)
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Configure Gradle for CI
-        run: |
-          echo "org.gradle.jvmargs=-Xmx8192M -Dfile.encoding=UTF-8" >> gradle.properties
-          echo "kotlin.daemon.jvmargs=-Xmx6144M" >> gradle.properties
-
-      # Optional pre-check build; publishing will build targets again as needed
-      - name: Build library (Android only to avoid iOS memory issues)
-        run: |
-          ./gradlew \
-            :chatia-ui-components:assembleRelease \
-            :chatia-ui-components:check \
-            -x lint \
-            --no-daemon \
-            --stacktrace
-
-      # Create and push tag before publishing if it does not already exist
-      - name: Create and push tag (if missing)
-        shell: bash
-        run: |
-          TAG="${{ github.event.inputs.versionName }}"
-          if git rev-parse "v$TAG" >/dev/null 2>&1; then
-            echo "Tag v$TAG already exists. Skipping tag creation."
-          else
-            git config --global user.email "mohamed.ashraf.radi0@gmail.com"
-            git config --global user.name "$GITHUB_ACTOR"
-            git tag -a "v$TAG" -m "Release v$TAG"
-            git push origin "v$TAG"
-          fi
-
-      # Publish with Vanniktech Maven Publish
-      - name: Publish Library to Maven Central
-        run: |
-          echo "Publishing library to Maven Central 🚀"
-          # Try to publish all targets, but continue if iOS fails
-          ./gradlew :chatia-ui-components:publish --no-configuration-cache --stacktrace || {
-            echo "Full publish failed, trying Android-only publish..."
-            ./gradlew :chatia-ui-components:publishAndroidReleasePublicationToMavenCentral --no-configuration-cache --stacktrace
-          }
-          echo "Published to Maven Central ✅"
+          distribution: 'zulu'
+          java-version: 21
+      - name: Publish to MavenCentral
+        run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:
-          ORG_GRADLE_PROJECT_VERSION_NAME: ${{ github.event.inputs.versionName }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYPASSWORD }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALUSERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALPASSWORD }}
-
-      - name: Create GitHub Release (draft)
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ github.event.inputs.versionName }}
-          name: v${{ github.event.inputs.versionName }}
-          draft: true
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYPASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
