@@ -1,9 +1,10 @@
 
+import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("com.vanniktech.maven.publish") version "0.34.0"
+    id("com.vanniktech.maven.publish") version "0.28.0"
 
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -11,9 +12,50 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
-
 group = "io.github.moashrafff"
-version = "1.0.0"
+version = "0.1.0"
+
+mavenPublishing {
+    // Define coordinates for the published artifact
+    coordinates(
+        artifactId = "chatia-ui-components",
+    )
+
+    // Configure POM metadata for the published artifact
+    pom {
+        name.set("Chatia Ui Component")
+        description.set("This library is for chatia project ui components")
+        inceptionYear.set("2025")
+        url.set("https://github.com/moashrafff/Chatia-ui-components")
+
+        licenses {
+            license {
+                name.set("MIT")
+                url.set("https://opensource.org/licenses/MIT")
+            }
+        }
+
+        // Specify developer information
+        developers {
+            developer {
+                id.set("moashrafff")
+                name.set("Mohamed Ashraf")
+                email.set("mohamed.ashraf.radi0@gmail.com")
+            }
+        }
+
+        // Specify SCM information
+        scm {
+            url.set("https://github.com/moashrafff/Chatia-ui-components")
+        }
+    }
+
+    // Configure publishing to Maven Central
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    // Enable GPG signing for all publications
+    signAllPublications()
+}
 
 kotlin {
     androidTarget {
@@ -52,45 +94,6 @@ kotlin {
     }
 }
 
-mavenPublishing {
-    publishToMavenCentral()
-
-    signAllPublications()
-
-    coordinates(
-        groupId = group.toString(),
-        artifactId = "chatia-ui-components",
-        version = version.toString()
-    )
-
-
-    pom {
-        name = "chatia-ui-components"
-        description = "chatia ui components library for project design system."
-        inceptionYear = "2025"
-        url = "https://github.com/moashrafff/Chatia-ui-components/"
-        licenses {
-            license {
-                name = "The Apache License, Version 2.0"
-                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
-            }
-        }
-        developers {
-            developer {
-                id = "moashrafff"
-                name = "moashrafff"
-                url = "https://github.com/moashrafff/"
-            }
-        }
-        scm {
-            url = "https://github.com/moashrafff/Chatia-ui-components/"
-            connection = "scm:git:git://github.com/moashrafff/chatia-ui-components.git"
-            developerConnection = "scm:git:ssh://git@github.com/moashrafff/chatia-ui-components.git"
-        }
-    }
-}
-
 android {
     namespace = "com.chatia.ui.components"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -117,4 +120,6 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
+
+
 

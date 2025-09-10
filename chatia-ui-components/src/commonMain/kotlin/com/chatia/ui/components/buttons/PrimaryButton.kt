@@ -31,8 +31,9 @@ fun PrimaryButton(
     textFontWeight: FontWeight,
     textFontSize: TextUnit = 16.sp,
     fontFamily: FontFamily = FontFamily.Default,
-    drawableResource: DrawableResource? =null
+    drawableResource: DrawableResource? = null
 ) {
+
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
