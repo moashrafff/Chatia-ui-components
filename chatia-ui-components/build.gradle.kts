@@ -5,23 +5,17 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.vanniktech.maven.publish") version "0.28.0"
-
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
 
-group = "io.github.moashrafff"
-version = "0.1.0"
-
 mavenPublishing {
-    // Define coordinates for the published artifact
     coordinates(
         artifactId = "chatia-ui-components",
     )
 
-    // Configure POM metadata for the published artifact
     pom {
         name.set("Chatia Ui Component")
         description.set("This library is for chatia project ui components")
@@ -35,7 +29,6 @@ mavenPublishing {
             }
         }
 
-        // Specify developer information
         developers {
             developer {
                 id.set("moashrafff")
@@ -44,16 +37,13 @@ mavenPublishing {
             }
         }
 
-        // Specify SCM information
         scm {
             url.set("https://github.com/moashrafff/Chatia-ui-components")
         }
     }
 
-    // Configure publishing to Maven Central
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-    // Enable GPG signing for all publications
     signAllPublications()
 }
 
@@ -66,7 +56,7 @@ kotlin {
 
     listOf(
         iosX64(), iosArm64(), iosSimulatorArm64()
-    ).forEach { iosTarget ->
+    ).forEach {  iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeLib"
             isStatic = true
