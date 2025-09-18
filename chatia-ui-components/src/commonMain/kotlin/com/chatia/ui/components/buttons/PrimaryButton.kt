@@ -58,7 +58,6 @@ fun PrimaryButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     elevation: ButtonElevation? = null
 ) {
-
     Button(
         modifier = modifier,
         onClick = onClick,
