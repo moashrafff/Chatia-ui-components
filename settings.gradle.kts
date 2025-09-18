@@ -28,5 +28,5 @@ dependencyResolutionManagement {
     }
 }
 
-include(":sample:composeApp")
 include(":chatia-ui-components")
+include(":composeApp")
