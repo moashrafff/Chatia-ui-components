@@ -54,7 +54,7 @@ fun PrimaryButton(
     textColor: Color = Color.White,
     textFontWeight: FontWeight,
     textFontSize: TextUnit = 16.sp,
-    drawableResource: DrawableResource? = null,
+    icon: (@Composable (() -> Unit))? = null,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     elevation: ButtonElevation? = null
 ) {
@@ -67,13 +67,10 @@ fun PrimaryButton(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            drawableResource?.let {
-                Icon(
-                    painter = painterResource(it),
-                    contentDescription = null,
-                )
+            icon?.let {
+                it()
             }
             PrimaryText(
                 text = text,
