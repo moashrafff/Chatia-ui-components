@@ -2,12 +2,15 @@ package com.chatia.ui.components.inputFields
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import com.chatia.ui.components.texts.PrimaryText
 
@@ -94,6 +97,11 @@ fun PrimaryInputField(
     textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyLarge,
     shape: androidx.compose.ui.graphics.Shape = MaterialTheme.shapes.small
 ) {
+    val message = when {
+        isError && !errorText.isNullOrBlank() -> errorText
+        !helperText.isNullOrBlank() -> helperText
+        else -> null
+    }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -108,16 +116,33 @@ fun PrimaryInputField(
         visualTransformation = visualTransformation,
         textStyle = textStyle,
         shape = shape,
-        label = label?.let { { PrimaryText(it, maxLines = 1, overflow = TextOverflow.Ellipsis, color = labelColor) } },
-        placeholder = placeholder?.let { { PrimaryText(it, style = MaterialTheme.typography.bodyMedium, color = placeholderColor) } },
+        label = label?.let {
+            {
+                PrimaryText(
+                    text = it, maxLines = 1, overflow = TextOverflow.Ellipsis, color = labelColor
+                )
+            }
+        },
+        placeholder = placeholder?.let {
+            {
+                PrimaryText(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = placeholderColor
+                )
+            }
+        },
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
-        supportingText = {
-           if (isError && !errorText.isNullOrBlank()) {
-                PrimaryText(errorText, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-            } else if (!helperText.isNullOrBlank()) {
-                PrimaryText(helperText, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-            } else null
+        supportingText = message?.let {
+            {
+                PrimaryText(
+                    text = it,
+                    color = if (isError) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         },
         colors = colors
     )
