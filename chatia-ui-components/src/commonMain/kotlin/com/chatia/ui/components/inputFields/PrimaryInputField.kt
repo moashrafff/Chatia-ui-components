@@ -47,8 +47,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun PrimaryInputField(
     modifier: Modifier = Modifier,
-    value: String="llll",
-    onValueChange: (String) -> Unit={},
+    value: String,
+    onValueChange: (String) -> Unit,
     label: String? = null,
     placeholder: String? = null,
     placeholderColor: Color = Color.Unspecified,

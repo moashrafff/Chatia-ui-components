@@ -24,4 +24,5 @@ data class ExtendedColors(
     val error : Color,
     val onError : Color,
     val textPrimary: Color,
+    val verticalGradient: List<Color>
 )

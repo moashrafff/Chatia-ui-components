@@ -1,10 +1,12 @@
 package com.chatia.ui.components
 
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.chatia.ui.theme.baseTheme.lightExtendedColors
 
 /*
  * Copyright (c) 2025 Chatia, Team.
@@ -27,9 +29,9 @@ import androidx.compose.ui.graphics.Color
  */
 fun Modifier.verticalGradientStops(
     vararg stops: Pair<Float, Color> = arrayOf(
-        0.12f to Color(0xFFFFFFFF),
-        0.24f to Color(0xFFFFE5F9),
-        0.66f to Color(0xFFFFF7EB)
+        0.12f to lightExtendedColors.verticalGradient.first(),
+        0.24f to lightExtendedColors.verticalGradient[1],
+        0.66f to lightExtendedColors.verticalGradient.last()
     )
 ): Modifier = drawBehind {
     val brush = Brush.linearGradient(
