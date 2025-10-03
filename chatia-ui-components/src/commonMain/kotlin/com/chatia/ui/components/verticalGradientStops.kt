@@ -26,7 +26,11 @@ import androidx.compose.ui.graphics.Color
  * @return A [Modifier] with the vertical gradient applied as a background.
  */
 fun Modifier.verticalGradientStops(
-    vararg stops: Pair<Float, Color>
+    vararg stops: Pair<Float, Color> = arrayOf(
+        0.12f to Color(0xFFFFFFFF),
+        0.24f to Color(0xFFFFE5F9),
+        0.66f to Color(0xFFFFF7EB)
+    )
 ): Modifier = drawBehind {
     val brush = Brush.linearGradient(
         *stops,
