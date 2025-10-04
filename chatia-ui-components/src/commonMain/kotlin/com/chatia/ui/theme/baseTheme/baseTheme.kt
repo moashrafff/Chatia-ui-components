@@ -39,8 +39,8 @@ internal val lightExtendedColors =
         lightGreenBG1 = Color(0xFF58DF94),
         textPrimary = Color(0xFF0D0D12),
         yellowBG = Color(0xFFFFBE4C),
+        verticalGradient = listOf(Color.White,Color(0xFFFFE5F9), Color(0xFFFFF7EB))
     )
-
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun mainFontFamily() = FontFamily(

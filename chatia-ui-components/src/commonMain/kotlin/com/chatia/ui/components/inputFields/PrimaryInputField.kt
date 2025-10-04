@@ -1,5 +1,6 @@
 package com.chatia.ui.components.inputFields
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -12,7 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.chatia.ui.components.texts.PrimaryText
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * Outlined input field aligned with Material 3 and your theme.
@@ -39,6 +42,8 @@ import com.chatia.ui.components.texts.PrimaryText
  * @param textStyle Optional override for text style. Defaults to [MaterialTheme.typography.bodyLarge].
  * @param shape Field shape. Defaults to [MaterialTheme.shapes.small].
  */
+
+@Preview
 @Composable
 fun PrimaryInputField(
     modifier: Modifier = Modifier,
@@ -60,42 +65,50 @@ fun PrimaryInputField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    colors: TextFieldColors = TextFieldDefaults.colors(
+    colors:TextFieldColors = TextFieldDefaults.colors(
+        //CONTAINER
+        focusedContainerColor = Color.White.copy(alpha = .5F),
+        unfocusedContainerColor = Color.White.copy(alpha = .5F),
+        disabledContainerColor = Color.White.copy(alpha = .5F),
+        errorContainerColor = Color.White.copy(alpha = .5F),
 
+        //INDICATOR
+        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+        unfocusedIndicatorColor = Color.White,
+        disabledIndicatorColor = Color.White.copy(alpha = 0.5f),
+        errorIndicatorColor = Color.White,
+
+        //TEXT
         focusedTextColor = MaterialTheme.colorScheme.onSurface,
         unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
         disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
         errorTextColor = MaterialTheme.colorScheme.onSurface,
+
+        //CURSOR
         cursorColor = MaterialTheme.colorScheme.primary,
         errorCursorColor = MaterialTheme.colorScheme.error,
 
-        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        disabledIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-        errorIndicatorColor = MaterialTheme.colorScheme.error,
-
+        //LABEL
         focusedLabelColor = MaterialTheme.colorScheme.primary,
         unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
         disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
         errorLabelColor = MaterialTheme.colorScheme.error,
 
+        //PLACEHOLDER
         focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
         unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
         errorPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
 
+        //LEADING ICON
         focusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
         unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
         focusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
         unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
         errorTrailingIconColor = MaterialTheme.colorScheme.error,
 
-        focusedContainerColor = Color.Transparent,
-        unfocusedContainerColor = Color.Transparent,
-        disabledContainerColor = Color.Transparent,
-        errorContainerColor = Color.Transparent,
     ),
     textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyLarge,
-    shape: androidx.compose.ui.graphics.Shape = MaterialTheme.shapes.small
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(48.dp)
 ) {
     val message = when {
         isError && !errorText.isNullOrBlank() -> errorText
